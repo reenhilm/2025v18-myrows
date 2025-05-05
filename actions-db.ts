@@ -2,7 +2,49 @@
 import { nextworkMessage, unauthorized } from "./constants";
 import ApiError from "./classes/api-error";
 import { Row } from "./interfaces/rows";
-import { createClient } from "./utils/supabase/server";
+import { createClient } from "@/utils/supabase/server";
+
+interface row {
+    text: string;
+}
+
+export async function insertRows(row: row): Promise<number | ApiError> {
+    try {
+    // Gets the server client (auth-aware, schema='rowsapp')
+    const supabase = await createClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        console.error('User not authenticated');
+        ApiError.fromError(401, unauthorized);
+    }
+
+    const { data, error } = await supabase
+        .from('rows')
+        .insert({ text: row.text })
+        .select(); // This returns the inserted rows
+    
+    if (error) {
+        if (error.code === '404')
+            return ApiError.fromError(404);
+
+        console.error('Error inserting row:', error);
+        throw ApiError.fromError(500, `Backend returned, Code:${error.code} Message:${error.message} (see console.error logs for more details)`);
+    }
+   
+    const insertedId = data?.[0]?.id;
+
+    if (typeof insertedId !== 'number') {
+        throw ApiError.fromError(500, 'Backend did not return the id of the newly inserted row as number');
+    }
+
+    return data[0].id as number;
+
+    } catch {
+        //catching all errors, we don't want to show all internal error-messages to client so providing general error to client
+        return ApiError.fromError(500, nextworkMessage);
+    }
+}
 
 export const fetchRowById = async (rowId: string): Promise<Row | ApiError> => {
     try {
@@ -12,14 +54,12 @@ export const fetchRowById = async (rowId: string): Promise<Row | ApiError> => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             console.error('User not authenticated');
-            ApiError.fromError(500, unauthorized);
+            ApiError.fromError(401, unauthorized);
         }
         const { data, error } = await supabase
             .from('rows')
             .select()
             .eq('id', rowId);
-
-        console.log(data, error);
         
         if (error) {
             if (error.code === '404')
@@ -51,14 +91,12 @@ export const fetchRowsByText = async (text: string): Promise<Row[] | ApiError> =
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             console.error('User not authenticated');
-            ApiError.fromError(500, unauthorized);
+            ApiError.fromError(401, unauthorized);
         }
         const { data, error } = await supabase
             .from('rows')
             .select();
         
-        console.log(data, error);
-
         if (error) {
             if (error.code === '404')
                 return ApiError.fromError(404);

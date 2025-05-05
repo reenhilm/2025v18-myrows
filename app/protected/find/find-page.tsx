@@ -10,7 +10,7 @@ import {
 import { Row } from '@/interfaces/rows';
 import ApiError from '@/classes/api-error';
 import { isApiError } from '@/utils/type-guards';
-import { fetchRowsByText } from '@/actions';
+import { fetchRowsByText } from '@/actions-db';
 import Link from 'next/link';
 
 export default function FindPage() {

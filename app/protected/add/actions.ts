@@ -1,27 +1,25 @@
 'use server'
 
-import { insertRows } from '@/db'
-import insertResponse from '@/interfaces/db-response';
+import { insertRows } from '@/actions-db'
+import ApiError from '@/classes/api-error';
 import { revalidatePath } from 'next/cache'
 
-export async function createRow(formData: FormData): Promise<insertResponse> {
+export async function createRow(formData: FormData): Promise<number | ApiError> {
     const textValue = formData.get('text') as string;
 
     if (!textValue || textValue.trim() === '') {
-        return { success: false, errorMessage: 'Text is required' };
+        return ApiError.fromError(412, 'Text is required');
     }   
 
     const inserted = await insertRows({ text: textValue })
 
-    if (inserted.success) {
-        // Replace with relevant path if needed
-        revalidatePath('/');
-        return { success: true, errorMessage: 'Row created successfully!' };
-    }
-    else {
-        if (inserted.errorMessage)
-            console.error(inserted.errorMessage);
+    if (inserted instanceof ApiError) {
+        console.error(ApiError);
 
-        return { success: false, errorMessage: 'DB backend error' };
-    }
+        return inserted;
+    }      
+
+    // Replace with relevant path if needed
+    revalidatePath('/');
+    return inserted;
 }

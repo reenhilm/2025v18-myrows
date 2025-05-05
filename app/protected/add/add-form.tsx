@@ -4,6 +4,7 @@ import { createRow } from './actions'
 import { toast } from "sonner"
 import { useRef } from 'react'
 import { Input } from '@/components/ui/input'
+import ApiError from '@/classes/api-error'
 
 const Page = () => {
     const formRef = useRef<HTMLFormElement>(null);
@@ -11,11 +12,12 @@ const Page = () => {
     const handleCreateRow = async (formData: FormData) => {
         const result = await createRow(formData);
 
-        if (result.success) {
-            toast.success("Success", { description: result.errorMessage });
+        if (result instanceof ApiError) {
+            toast.error("Error", { description: result.message });
+        }
+        else {
+            toast.success("Success", { description: `Successfully created row ${result}` });
             formRef.current?.reset();
-        } else {
-            toast.error("Error", { description: result.errorMessage });
         }
     }
 

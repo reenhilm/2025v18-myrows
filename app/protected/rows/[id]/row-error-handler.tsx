@@ -3,19 +3,19 @@ import ApiError from "@/classes/api-error";
 import ErrorDialog from "@/components/ui/error-dialog";
 import { notFound } from "next/navigation";
 import RowMain from "./row-main";
-import { fetchRowById } from "@/actions";
+import { fetchRowById } from '@/actions-db';
 
 export default async function RowErrorHandler({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     //TODO get group from logged in user
-    const receipt = await fetchRowById(id);
+    const row = await fetchRowById(id);
 
-    if (receipt instanceof ApiError) {
-        if (receipt.show404) {
+    if (row instanceof ApiError) {
+        if (row.show404) {
             return notFound();
         }
-        return <ErrorDialog message={receipt.message} />;
+        return <ErrorDialog message={row.message} />;
     }
 
-    return <RowMain row={receipt} />;
+    return <RowMain row={row} />;
 }
