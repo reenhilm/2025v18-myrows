@@ -1,14 +1,14 @@
 'use server'
 
 import { insertRows } from '@/app/db/db'
+import insertResponse from '@/interfaces/db-response';
 import { revalidatePath } from 'next/cache'
 
-export async function createRow(formData: FormData) {
-    const textValue = formData.get('text') as string
+export async function createRow(formData: FormData): Promise<insertResponse> {
+    const textValue = formData.get('text') as string;
 
     if (!textValue || textValue.trim() === '') {
-        // Optionally handle invalid input
-        throw new Error('Text is required');
+        return { success: false, errorMessage: 'Text is required' };
     }   
 
     const inserted = await insertRows({ text: textValue })
@@ -16,11 +16,12 @@ export async function createRow(formData: FormData) {
     if (inserted.success) {
         // Replace with relevant path if needed
         revalidatePath('/');
+        return { success: true, errorMessage: 'Row created successfully!' };
     }
     else {
-        if (inserted.error)
-            console.error(inserted.error);
+        if (inserted.errorMessage)
+            console.error(inserted.errorMessage);
 
-        throw new Error('db backend error');
+        return { success: false, errorMessage: 'DB backend error' };
     }
 }
