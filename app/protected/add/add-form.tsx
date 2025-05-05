@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { createRow } from './actions'
 import { toast } from "sonner"
 import { useRef } from 'react'
+import { Input } from '@/components/ui/input'
 
 const Page = () => {
     const formRef = useRef<HTMLFormElement>(null);
@@ -20,7 +21,7 @@ const Page = () => {
 
     return (
         <form className="flex flex-col md:flex-row gap-5" ref={formRef} action={handleCreateRow}>
-            <input type="text" name="text" required placeholder="text in your row" aria-label="text in your row" />
+            <Input type="text" name="text" required placeholder="text in your row" aria-label="text in your row" />
             <Button className='align-center' type="submit">Create row</Button>
         </form>
     )

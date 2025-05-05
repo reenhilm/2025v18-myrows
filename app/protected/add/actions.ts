@@ -1,6 +1,6 @@
 'use server'
 
-import { insertRows } from '@/app/db/db'
+import { insertRows } from '@/db'
 import insertResponse from '@/interfaces/db-response';
 import { revalidatePath } from 'next/cache'
 

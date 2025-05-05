@@ -1,26 +1,41 @@
 "use server";
-import { fetchFailedMessage, nextworkMessage } from "./constants";
+import { nextworkMessage, unauthorized } from "./constants";
 import ApiError from "./classes/api-error";
-import { Receipt } from "./interfaces/receipt";
+import { Row } from "./interfaces/rows";
+import { createClient } from "./utils/supabase/server";
 
-export const fetchReceiptById = async (receiptId: string, groupId:number): Promise<Receipt | ApiError> => {
+export const fetchRowById = async (rowId: string): Promise<Row | ApiError> => {
     try {
-        const res = await fetch(`https://reenhilm.github.io/Data/receiptdb_group${groupId}.json`);
+        console.log("fetchRowById started");
+        const supabase = await createClient();
+    
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            console.error('User not authenticated');
+            ApiError.fromError(500, unauthorized);
+        }
+        const { data, error } = await supabase
+            .from('rows')
+            .select()
+            .eq('id', rowId);
 
-        if (res.status == 404)
-            return ApiError.fromError(404);
+        console.log(data, error);
+        
+        if (error) {
+            if (error.code === '404')
+                return ApiError.fromError(404);
 
-        if (!res.ok) {
-            //logging could be done here
-            throw ApiError.fromError(res.status, fetchFailedMessage);
+            console.error('Error fetching row:', error);
+            throw ApiError.fromError(500, `Backend returned, Code:${error.code} Message:${error.message} (see console.error logs for more details)`);
         }
 
-        const data: Receipt[] = await res.json();
-        const foundReceipt: Receipt | undefined = data.find(r => r.id === receiptId);
-        if(foundReceipt === undefined)
+        //This find should not be needed since supabase has .eq('id', rowId) already done for us
+        const dataArr: Row[] = data;
+        const foundRow: Row | undefined = dataArr.find(r => r.id.toString() === rowId);
+        if (foundRow === undefined)
             return ApiError.fromError(404);
         
-        return foundReceipt;
+        return foundRow;
 
     } catch {
         //catching all errors, we don't want to show all internal error-messages to client so providing general error to client
@@ -28,27 +43,37 @@ export const fetchReceiptById = async (receiptId: string, groupId:number): Promi
     }
 };
 
-export const fetchReceiptsByText = async (text: string, groupId: number): Promise<Receipt[] | ApiError> => {
+export const fetchRowsByText = async (text: string): Promise<Row[] | ApiError> => {
     try {
-        const res = await fetch(`https://reenhilm.github.io/Data/receiptdb_group${groupId}.json`);
+        console.log("fetchRowsByText started");
+        const supabase = await createClient();
 
-        if (res.status == 404)
-            return ApiError.fromError(404);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            console.error('User not authenticated');
+            ApiError.fromError(500, unauthorized);
+        }
+        const { data, error } = await supabase
+            .from('rows')
+            .select();
+        
+        console.log(data, error);
 
-        if (!res.ok) {
-            //logging could be done here
-            throw ApiError.fromError(res.status, fetchFailedMessage);
+        if (error) {
+            if (error.code === '404')
+                return ApiError.fromError(404);
+
+            console.error('Error fetching rows:', error);
+            throw ApiError.fromError(500, `Backend returned, Code:${error.code} Message:${error.message} (see console.error logs for more details)`);
         }
 
-        const data: Receipt[] = await res.json();
-        const foundReceipts: Receipt[] = data.filter(r => {
+        const dataArr: Row[] = data;
+        const foundRows: Row[] = dataArr.filter(r => {
             const textUpper = text.toUpperCase();
 
-            return r.description.toUpperCase().includes(textUpper) ||
-                r.title.toUpperCase().includes(textUpper) ||
-                r.retailer_name.toUpperCase().includes(textUpper);
+            return r.text.toUpperCase().includes(textUpper);
         });
-        return foundReceipts;
+        return foundRows;
 
     } catch {
         //catching all errors, we don't want to show all internal error-messages to client so providing general error to client

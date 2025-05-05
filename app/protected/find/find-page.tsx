@@ -7,26 +7,26 @@ import {
     CommandItem,
     CommandEmpty,
 } from '@/components/ui/command';
-import { Receipt } from '@/interfaces/receipt';
+import { Row } from '@/interfaces/rows';
 import ApiError from '@/classes/api-error';
 import { isApiError } from '@/utils/type-guards';
-import { fetchReceiptsByText } from '@/actions';
+import { fetchRowsByText } from '@/actions';
 import Link from 'next/link';
 
 export default function FindPage() {
     const [inputValue, setInputValue] = useState('');
-    const [receipts, setReceipts] = useState<Receipt[] | ApiError>([]);
+    const [rows, setRows] = useState<Row[] | ApiError>([]);
     const [hasSearched, setHasSearched] = useState(false);
 
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             if (inputValue.length >= 3) {
-                fetchReceiptsByText(inputValue, 2).then((result) => {
-                    setReceipts(result);
+                fetchRowsByText(inputValue).then((result) => {
+                    setRows(result);
                     setHasSearched(true);
                 });
             } else {
-                setReceipts([]);
+                setRows([]);
                 setHasSearched(false);
             }
         }, 300);
@@ -34,7 +34,7 @@ export default function FindPage() {
         return () => clearTimeout(delayDebounce);
     }, [inputValue]);
 
-    const showResults = !isApiError(receipts) && receipts.length > 0;
+    const showResults = !isApiError(rows) && rows.length > 0;
     console.log("showresults:" + showResults);
 
     return (
@@ -42,18 +42,18 @@ export default function FindPage() {
             <div className="max-w-lg w-full mt-10">
                 <Command shouldFilter={false}>
                     <CommandInput
-                        placeholder="Search receipts..."
+                        placeholder="Search rows..."
                         value={inputValue}
                         onValueChange={setInputValue}
                     />
                     <CommandList>
                         {showResults ? (
-                            receipts.map((r) => (
+                            rows.map((r) => (
                                 <CommandItem key={r.id} className="flex flex-col items-start">
                                     <Link
-                                     href={`./receipts/${r.id}`}>
-                                    <span className="font-medium block">{r.title}</span>
-                                    <span className="text-sm text-muted-foreground block">{r.description}</span>
+                                     href={`./rows/${r.id}`}>
+                                    <span className="font-medium block">{r.id}</span>
+                                    <span className="text-sm text-muted-foreground block">{r.text}</span>
                                     </Link>
                                 </CommandItem>
                             ))

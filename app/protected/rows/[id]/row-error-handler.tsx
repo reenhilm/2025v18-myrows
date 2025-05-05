@@ -2,13 +2,13 @@
 import ApiError from "@/classes/api-error";
 import ErrorDialog from "@/components/ui/error-dialog";
 import { notFound } from "next/navigation";
-import ReceiptMain from "./receipt-main";
-import { fetchReceiptById } from "@/actions";
+import RowMain from "./row-main";
+import { fetchRowById } from "@/actions";
 
-export default async function ReceiptErrorHandler({ params }: { params: Promise<{ id: string }> }) {
+export default async function RowErrorHandler({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     //TODO get group from logged in user
-    const receipt = await fetchReceiptById(id, 2);
+    const receipt = await fetchRowById(id);
 
     if (receipt instanceof ApiError) {
         if (receipt.show404) {
@@ -17,5 +17,5 @@ export default async function ReceiptErrorHandler({ params }: { params: Promise<
         return <ErrorDialog message={receipt.message} />;
     }
 
-    return <ReceiptMain receipt={receipt} />;
+    return <RowMain row={receipt} />;
 }
