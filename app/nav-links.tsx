@@ -13,7 +13,7 @@ export default async function NavLinks() {
             {user ? (
                 <>
                     <Link href="/protected/find" className="mx-1 py-1 px-3 font-semibold uppercase hover:underline visually-hidden">FIND</Link>
-                    <Link href="/add" className="mx-1 py-1 px-3 font-semibold uppercase hover:underline visually-hidden">ADD</Link>
+                    <Link href="/protected/add" className="mx-1 py-1 px-3 font-semibold uppercase hover:underline visually-hidden">ADD</Link>
                 </>
             ) : (
                 <>
