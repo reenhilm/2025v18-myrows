@@ -11,10 +11,10 @@ const Page = () => {
         const result = await createRow(formData);
 
         if (result.success) {
-            toast.success(result.errorMessage);
+            toast.success("Success", { description: result.errorMessage });
             formRef.current?.reset();
         } else {
-            toast.error(result.errorMessage);
+            toast.error("Error", { description: result.errorMessage });
         }
     }
 
