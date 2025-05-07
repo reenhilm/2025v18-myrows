@@ -10,7 +10,7 @@ import {
 import { Row } from '@/interfaces/rows';
 import ApiError from '@/classes/api-error';
 import { isApiError } from '@/utils/type-guards';
-import { fetchRowsByText } from '@/actions-db';
+import { findRowsViaApi } from '@/utils/api-client';
 import Link from 'next/link';
 
 export default function FindPage() {
@@ -21,7 +21,7 @@ export default function FindPage() {
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             if (inputValue.length >= 3) {
-                fetchRowsByText(inputValue).then((result) => {
+                findRowsViaApi(inputValue).then((result) => {
                     setRows(result);
                     setHasSearched(true);
                 });
@@ -35,7 +35,6 @@ export default function FindPage() {
     }, [inputValue]);
 
     const showResults = !isApiError(rows) && rows.length > 0;
-    console.log("showresults:" + showResults);
 
     return (
         <main className="col-start-2 -col-end-2 flex flex-col items-center  gap-15">
