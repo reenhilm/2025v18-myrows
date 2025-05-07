@@ -1,6 +1,12 @@
 # 2025v18-myrows proof of concept project
   
 A CRUD application using supabase. Based from another project I did a few weeks ago.
+
+Currently using API Routes because they specifically asked for it.
+
+Code looked cleaner (and safer) without API Routes:  
+[repo, point in time without API Routes](https://github.com/reenhilm/2025v18-myrows/tree/727b5328610f903170da3b5252a354cfc0a0ee53)  
+
   
 ## Why?  
 Learning supabase
