@@ -3,9 +3,10 @@ import { createClient } from '@/utils/supabase/server'
 import ApiError from '@/classes/api-error'
 import { unauthorized, networkMessage } from '@/constants'
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
     try {
-        const { text } = await req.json();
+        const { searchParams } = new URL(req.url)
+        const text = searchParams.get('text')
 
         if (!text || typeof text !== 'string' || text.trim().length < 3) {
             return NextResponse.json(ApiError.fromError(400, 'Search text must be at least 3 characters long'), { status: 400 });

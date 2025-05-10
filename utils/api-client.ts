@@ -107,10 +107,9 @@ export async function createRowViaApi(text: string): Promise<number | ApiError> 
 
 export async function findRowsViaApi(text: string): Promise<Row[] | ApiError> {
     try {
-        const res = await fetch(`${baseUrl}/api/rows/find`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
+        const encodedText = encodeURIComponent(text);
+        const res = await fetch(`${baseUrl}/api/rows/find?text=${encodedText}`, {
+            method: 'GET',
         });
 
         const result = await res.json();
