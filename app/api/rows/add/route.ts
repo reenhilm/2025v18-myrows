@@ -36,8 +36,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ id: insertedId }, { status: 200 });
 
-    } catch (err) {
-        console.error(err);
+    } catch {
         return NextResponse.json(ApiError.fromError(500, networkMessage), { status: 500 });
     }
 }

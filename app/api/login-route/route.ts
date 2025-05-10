@@ -5,7 +5,6 @@ import { createClient } from '@/utils/supabase/server';
 
 export async function POST(req: NextRequest) {
     try {
-        console.log('POST /api/rows/login-route');
         const { email, password } = await req.json();
 
         if (!email || typeof email !== 'string') {            

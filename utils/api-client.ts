@@ -33,8 +33,40 @@ export async function login(email: string, password: string): Promise<boolean | 
         }
 
         return result.id;
-    } catch (err) {
-        console.error(err);
+    } catch {
+        return ApiError.fromError(500, "Network or unexpected error");
+    }
+}
+
+export async function logout(): Promise<boolean | ApiError> {
+    try {
+        const res = await fetch(`${baseUrl}/api/logout-route`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            if (result && isApiError(result)) {
+                if (result.show404) {
+                    return ApiError.fromError(404);
+                }
+
+                if (result.message) {
+                    return ApiError.fromError(
+                        result.status_code,
+                        result.message
+                    );
+                }
+            }
+
+            // Fallback if API didn't return structured error
+            return ApiError.fromError(res.status, 'Unexpected error');
+        }
+
+        return result.id;
+    } catch {
         return ApiError.fromError(500, "Network or unexpected error");
     }
 }
@@ -68,8 +100,7 @@ export async function createRowViaApi(text: string): Promise<number | ApiError> 
         }
 
         return result.id;
-    } catch (err) {
-        console.error(err);
+    } catch {
         return ApiError.fromError(500, "Network or unexpected error");
     }
 }
@@ -103,8 +134,7 @@ export async function findRowsViaApi(text: string): Promise<Row[] | ApiError> {
         }
 
         return result as Row[];
-    } catch (err) {
-        console.error(err);
+    } catch {
         return ApiError.fromError(500, 'Unexpected error during search');
     }
 }
@@ -148,8 +178,7 @@ export async function fetchRowViaApiWithCookies(id: string, cookieHeader: string
         }
 
         return result as Row;
-    } catch (err) {
-        console.error('fetchRowViaApi error:', err);
+    } catch {
         return ApiError.fromError(500, 'Unexpected client-side error fetching row');
     }
 }

@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
         if (error) {
             return NextResponse.json(ApiError.fromError(500, error.message), { status: 500 });
         }
-        console.log(data);
         
         const foundRow = data?.[0];
         if (!foundRow) {
@@ -35,8 +34,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(foundRow, { status: 200 });
 
-    } catch (err) {
-        console.error(err);
+    } catch {
         return NextResponse.json(ApiError.fromError(500, networkMessage), { status: 500 });
     }
 }

@@ -1,6 +1,5 @@
-import { signOutAction } from "@/app/actions";
 import { createClient } from "@/utils/supabase/server";
-import { Button } from "@/components/ui/button";
+import SignOutForm from "./sign-out-form";
 
 export default async function HeaderAuth() {
     const supabase = await createClient();
@@ -14,11 +13,7 @@ export default async function HeaderAuth() {
             <div className="whitespace-nowrap px-3">
                 Hey, {user.email}!
             </div>
-            <form action={signOutAction}>
-                <Button type="submit" variant={"outline"}>
-                    Sign out
-                </Button>
-            </form>
+            <SignOutForm />
         </div>
     )
 }
