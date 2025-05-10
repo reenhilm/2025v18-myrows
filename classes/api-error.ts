@@ -2,8 +2,10 @@ export default class ApiError {
     private _show404: boolean = false;
     private _showCustom: boolean = false;
     private _message: string | null = null;
+    private _statusCode: number;
 
     constructor(public statusCode: number) {
+        this._statusCode = statusCode;
         if (statusCode === 404) {
             this._show404 = true;
         }
@@ -21,6 +23,10 @@ export default class ApiError {
         return this._message;
     }
 
+    get status_code(): number {
+        return this._statusCode;
+    }    
+
     setCustomMessage(message: string): void {
         if (!message) {
             throw new Error("A message is required when setting showCustom to true.");
@@ -36,5 +42,13 @@ export default class ApiError {
             error.setCustomMessage(message);
         }
         return error;
+    }
+
+    toJSON() {
+        return {
+            statusCode: this.statusCode,
+            message: this.message,
+            show404: this.show404 ?? false,
+        };
     }
 }

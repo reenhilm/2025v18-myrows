@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button'
 import { toast } from "sonner"
 import { useRef } from 'react'
 import { Input } from '@/components/ui/input'
-import ApiError from '@/classes/api-error'
 import { createRowViaApi } from '@/utils/api-client'
+import { isApiError } from '@/utils/type-guards'
 
 const Page = () => {
     const formRef = useRef<HTMLFormElement>(null);
@@ -15,7 +15,7 @@ const Page = () => {
         const text = formData.get("text")?.toString() || "";
         const result = await createRowViaApi(text);
 
-        if (result instanceof ApiError) {
+        if (isApiError(result)) {
             toast.error("Error", { description: result.message });
         }
         else {

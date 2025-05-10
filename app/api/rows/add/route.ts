@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import ApiError from '@/classes/api-error'
-import { nextworkMessage, unauthorized } from '@/constants'
+import { networkMessage, unauthorized } from '@/constants'
 
 export async function POST(req: NextRequest) {
     try {
@@ -38,6 +38,6 @@ export async function POST(req: NextRequest) {
 
     } catch (err) {
         console.error(err);
-        return NextResponse.json(ApiError.fromError(500, nextworkMessage), { status: 500 });
+        return NextResponse.json(ApiError.fromError(500, networkMessage), { status: 500 });
     }
 }

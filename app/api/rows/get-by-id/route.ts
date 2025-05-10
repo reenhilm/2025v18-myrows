@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ApiError from '@/classes/api-error'
-import { unauthorized, nextworkMessage } from '@/constants'
+import { unauthorized, networkMessage } from '@/constants'
 import { createClient } from '@/utils/supabase/server';
 
 export async function POST(req: NextRequest) {
@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
         if (error) {
             return NextResponse.json(ApiError.fromError(500, error.message), { status: 500 });
         }
-
+        console.log(data);
+        
         const foundRow = data?.[0];
         if (!foundRow) {
             return NextResponse.json(ApiError.fromError(404));
@@ -36,6 +37,6 @@ export async function POST(req: NextRequest) {
 
     } catch (err) {
         console.error(err);
-        return NextResponse.json(ApiError.fromError(500, nextworkMessage), { status: 500 });
+        return NextResponse.json(ApiError.fromError(500, networkMessage), { status: 500 });
     }
 }

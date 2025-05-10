@@ -1,7 +1,43 @@
 import ApiError from "@/classes/api-error";
 import { Row } from '@/interfaces/rows'
+import { isApiError } from "./type-guards";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+export async function login(email: string, password: string): Promise<boolean | ApiError> {
+    try {
+        const res = await fetch(`${baseUrl}/api/login-route`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            if (result && isApiError(result)) {
+                if (result.show404) {
+                    return ApiError.fromError(404);
+                }
+
+                if (result.message) {
+                    return ApiError.fromError(
+                        result.status_code,
+                        result.message
+                    );
+                }
+            }
+
+            // Fallback if API didn't return structured error
+            return ApiError.fromError(res.status, 'Unexpected error');
+        }
+
+        return result.id;
+    } catch (err) {
+        console.error(err);
+        return ApiError.fromError(500, "Network or unexpected error");
+    }
+}
 
 export async function createRowViaApi(text: string): Promise<number | ApiError> {
     try {
@@ -14,13 +50,14 @@ export async function createRowViaApi(text: string): Promise<number | ApiError> 
         const result = await res.json();
 
         if (!res.ok) {
-            if (result) {
-                if (result.show404)
+            if (result && isApiError(result)) {
+                if (result.show404) {
                     return ApiError.fromError(404);
+                }
 
                 if (result.message) {
                     return ApiError.fromError(
-                        res.status,
+                        result.status_code,
                         result.message
                     );
                 }
@@ -48,13 +85,14 @@ export async function findRowsViaApi(text: string): Promise<Row[] | ApiError> {
         const result = await res.json();
 
         if (!res.ok) {
-            if (result) {
-                if (result.show404)
+            if (result && isApiError(result)) {
+                if (result.show404) {
                     return ApiError.fromError(404);
+                }
 
                 if (result.message) {
                     return ApiError.fromError(
-                        res.status,
+                        result.status_code,
                         result.message
                     );
                 }
@@ -92,13 +130,14 @@ export async function fetchRowViaApiWithCookies(id: string, cookieHeader: string
         const result = await res.json();
 
         if (!res.ok) {
-            if (result) {
-                if (result.show404)
+            if (result && isApiError(result)) {
+                if (result.show404) {
                     return ApiError.fromError(404);
+                }
 
                 if (result.message) {
                     return ApiError.fromError(
-                        res.status,
+                        result.status_code,
                         result.message
                     );
                 }
