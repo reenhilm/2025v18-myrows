@@ -3,9 +3,10 @@ import ApiError from '@/classes/api-error'
 import { unauthorized, networkMessage } from '@/constants'
 import { createClient } from '@/utils/supabase/server';
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
     try {
-        const { id } = await req.json();
+        const { searchParams } = new URL(req.url)
+        const id = searchParams.get('id')        
 
         if (!id || typeof id !== 'string') {
             return NextResponse.json(ApiError.fromError(400, 'Invalid row ID'), { status: 400 });

@@ -146,13 +146,12 @@ export async function fetchRowViaApiWithCookies(id: string, cookieHeader: string
     //⚠️ But keep in mind: this is only safe on the server. Never do this in client components.
 
     try {
-        const res = await fetch(`${baseUrl}/api/rows/get-by-id`, {
-            method: 'POST',
+        const encodedId = encodeURIComponent(id);
+        const res = await fetch(`${baseUrl}/api/rows/get-by-id?id=${encodedId}`, {
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
                 Cookie: cookieHeader
             },
-            body: JSON.stringify({ id }),
             credentials: 'include'
         });
 
