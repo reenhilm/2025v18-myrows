@@ -3,7 +3,6 @@ import { useRef } from 'react';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from "sonner"
-import ApiError from '@/classes/api-error';
 import { login } from '@/utils/api-client';
 import { isApiError } from '@/utils/type-guards';
 
