@@ -4,12 +4,118 @@ import { isApiError } from "./type-guards";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+export async function setPassword(password: string): Promise<boolean | ApiError> {
+    try {
+        const res = await fetch(`${baseUrl}/api/set-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            if (result && isApiError(result)) {
+                if (result.show404) {
+                    return ApiError.fromError(404);
+                }
+
+                if (result.message) {
+                    return ApiError.fromError(
+                        result.status_code,
+                        result.message
+                    );
+                }
+            }
+
+            // Fallback if API didn't return structured error
+            return ApiError.fromError(res.status, 'Unexpected error');
+        }
+
+        return result.id;
+    } catch {
+        return ApiError.fromError(500, "Network or unexpected error");
+    }
+}
+
+export async function forgotPassword(email: string): Promise<boolean | ApiError> {
+    try {
+        const res = await fetch(`${baseUrl}/api/forgot-password-route`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            if (result && isApiError(result)) {
+                if (result.show404) {
+                    return ApiError.fromError(404);
+                }
+
+                if (result.message) {
+                    return ApiError.fromError(
+                        result.status_code,
+                        result.message
+                    );
+                }
+            }
+
+            // Fallback if API didn't return structured error
+            return ApiError.fromError(res.status, 'Unexpected error');
+        }
+
+        return result.id;
+    } catch {
+        return ApiError.fromError(500, "Network or unexpected error");
+    }
+}
+
 export async function login(email: string, password: string): Promise<boolean | ApiError> {
     try {
         const res = await fetch(`${baseUrl}/api/login-route`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            if (result && isApiError(result)) {
+                if (result.show404) {
+                    return ApiError.fromError(404);
+                }
+
+                if (result.message) {
+                    return ApiError.fromError(
+                        result.status_code,
+                        result.message
+                    );
+                }
+            }
+
+            // Fallback if API didn't return structured error
+            return ApiError.fromError(res.status, 'Unexpected error');
+        }
+
+        return result.id;
+    } catch {
+        return ApiError.fromError(500, "Network or unexpected error");
+    }
+}
+
+export async function loginOtpWithCookies(email: string, token: string, cookieHeader: string): Promise<boolean | ApiError> {
+    try {
+        const res = await fetch(`${baseUrl}/api/login-with-otp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Cookie: cookieHeader
+            },
+            body: JSON.stringify({ email, token }),
+            credentials: 'include'
         });
 
         const result = await res.json();
